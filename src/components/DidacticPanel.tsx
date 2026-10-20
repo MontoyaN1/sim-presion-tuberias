@@ -126,8 +126,9 @@ export function DidacticPanel() {
           <button
             key={item.title}
             type="button"
+            aria-pressed={step === index}
             onClick={() => setStep(index)}
-            className={`rounded-lg border px-2 py-1.5 text-xs font-medium transition ${
+            className={`rounded-lg border px-2 py-1.5 text-xs font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 ${
               step === index
                 ? 'border-sky-500 bg-sky-500/10 text-sky-300'
                 : 'border-slate-700 text-slate-400 hover:border-slate-500'
@@ -160,7 +161,7 @@ export function DidacticPanel() {
           type="button"
           disabled={step === 0}
           onClick={() => setStep(Math.max(0, step - 1))}
-          className="rounded-lg border border-slate-700 px-3 py-1.5 text-sm font-semibold text-slate-200 transition hover:border-slate-500 disabled:cursor-not-allowed disabled:opacity-40"
+          className="rounded-lg border border-slate-700 px-3 py-1.5 text-sm font-semibold text-slate-200 transition hover:border-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 disabled:cursor-not-allowed disabled:opacity-40"
         >
           Anterior
         </button>
@@ -168,7 +169,7 @@ export function DidacticPanel() {
           type="button"
           disabled={step === STEPS.length - 1}
           onClick={() => setStep(Math.min(STEPS.length - 1, step + 1))}
-          className="rounded-lg bg-sky-500 px-3 py-1.5 text-sm font-semibold text-slate-950 transition hover:bg-sky-400 disabled:cursor-not-allowed disabled:opacity-40"
+          className="rounded-lg bg-sky-500 px-3 py-1.5 text-sm font-semibold text-slate-950 transition hover:bg-sky-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 disabled:cursor-not-allowed disabled:opacity-40"
         >
           Siguiente
         </button>

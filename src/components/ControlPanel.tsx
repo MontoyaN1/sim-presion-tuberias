@@ -4,10 +4,12 @@ import { useSimulationStore } from '../store/simulationStore'
 import type { MeasurementMethod } from '../store/simulationStore'
 
 const selectClass =
-  'mt-1 w-full rounded-lg border border-slate-700 bg-slate-950 px-2.5 py-2 text-sm text-slate-200 outline-none focus:border-sky-500'
+  'mt-1 w-full rounded-lg border border-slate-700 bg-slate-950 px-2.5 py-2 text-sm text-slate-200 outline-none focus:border-sky-500 focus-visible:ring-2 focus-visible:ring-sky-400'
 
 const buttonBase =
-  'rounded-lg px-3 py-2 text-sm font-semibold transition'
+  'rounded-lg px-3 py-2 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900'
+
+const sliderClass = 'mt-2 w-full accent-sky-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400'
 
 const METHOD_OPTIONS: { id: MeasurementMethod; label: string }[] = [
   { id: 'tof', label: 'TOF' },
@@ -56,8 +58,10 @@ export function ControlPanel() {
             max={10}
             step={0.1}
             value={pressure / 1e6}
+            aria-label="Presión interna"
+            aria-valuetext={`${(pressure / 1e6).toFixed(1)} megapascales`}
             onChange={(event) => setPressure(Number(event.target.value) * 1e6)}
-            className="mt-2 w-full accent-sky-400"
+            className={sliderClass}
           />
         </label>
 
@@ -106,8 +110,10 @@ export function ControlPanel() {
             max={200}
             step={5}
             value={Math.round(innerRadius * 1000)}
+            aria-label="Radio interno"
+            aria-valuetext={`${(innerRadius * 1000).toFixed(0)} milímetros`}
             onChange={(event) => setInnerRadius(Number(event.target.value) / 1000)}
-            className="mt-2 w-full accent-sky-400"
+            className={sliderClass}
           />
         </label>
 
@@ -124,8 +130,10 @@ export function ControlPanel() {
             max={15}
             step={0.5}
             value={wallThickness * 1000}
+            aria-label="Espesor de pared"
+            aria-valuetext={`${(wallThickness * 1000).toFixed(1)} milímetros`}
             onChange={(event) => setWallThickness(Number(event.target.value) / 1000)}
-            className="mt-2 w-full accent-sky-400"
+            className={sliderClass}
           />
         </label>
 
@@ -140,8 +148,10 @@ export function ControlPanel() {
             max={5}
             step={0.05}
             value={noise * 100}
+            aria-label="Ruido de medición"
+            aria-valuetext={`${(noise * 100).toFixed(2)} por ciento`}
             onChange={(event) => setNoise(Number(event.target.value) / 100)}
-            className="mt-2 w-full accent-sky-400"
+            className={sliderClass}
           />
         </label>
 
@@ -154,7 +164,7 @@ export function ControlPanel() {
                 type="button"
                 aria-pressed={method === option.id}
                 onClick={() => setMethod(option.id)}
-                className={`rounded-md px-3 py-1.5 text-sm font-medium transition ${
+                className={`rounded-md px-3 py-1.5 text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 ${
                   method === option.id
                     ? 'bg-sky-500 text-slate-950'
                     : 'text-slate-400 hover:text-slate-200'

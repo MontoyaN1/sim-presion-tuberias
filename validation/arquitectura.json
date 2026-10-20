@@ -1,0 +1,241 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Arquitectura de la simulación de presión no invasiva",
+    "quality_profile": "showcase",
+    "viewBox": [
+      1360,
+      840
+    ]
+  },
+  "components": [
+    {
+      "id": "usuario",
+      "type": "external",
+      "label": "Usuario",
+      "sublabel": "Navegador",
+      "pos": [
+        40,
+        360
+      ],
+      "size": [
+        130,
+        64
+      ]
+    },
+    {
+      "id": "ui",
+      "type": "frontend",
+      "label": "Interfaz React",
+      "sublabel": "Controles · lecturas",
+      "pos": [
+        240,
+        340
+      ],
+      "size": [
+        190,
+        80
+      ]
+    },
+    {
+      "id": "store",
+      "type": "frontend",
+      "label": "Estado Zustand",
+      "sublabel": "presión · fluido · campo",
+      "pos": [
+        500,
+        340
+      ],
+      "size": [
+        180,
+        80
+      ]
+    },
+    {
+      "id": "modelo",
+      "type": "backend",
+      "label": "Modelo físico",
+      "sublabel": "esfuerzos · TOF",
+      "pos": [
+        760,
+        340
+      ],
+      "size": [
+        210,
+        80
+      ]
+    },
+    {
+      "id": "escena",
+      "type": "frontend",
+      "label": "Escena 3D",
+      "sublabel": "4 sensores · haces",
+      "pos": [
+        1040,
+        180
+      ],
+      "size": [
+        210,
+        86
+      ]
+    },
+    {
+      "id": "graficas",
+      "type": "frontend",
+      "label": "Gráficas",
+      "sublabel": "Recharts",
+      "pos": [
+        1040,
+        350
+      ],
+      "size": [
+        190,
+        70
+      ]
+    },
+    {
+      "id": "validacion",
+      "type": "backend",
+      "label": "Validación Monte Carlo",
+      "sublabel": "500 corridas por fluido",
+      "pos": [
+        760,
+        540
+      ],
+      "size": [
+        210,
+        80
+      ]
+    },
+    {
+      "id": "python",
+      "type": "backend",
+      "label": "Contraste Python",
+      "sublabel": "compare.py",
+      "pos": [
+        760,
+        700
+      ],
+      "size": [
+        210,
+        70
+      ]
+    },
+    {
+      "id": "artefactos",
+      "type": "database",
+      "label": "Artefactos",
+      "sublabel": "JSON · figuras PNG",
+      "pos": [
+        1040,
+        700
+      ],
+      "size": [
+        190,
+        70
+      ]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "Cliente (navegador)",
+      "wraps": [
+        "ui",
+        "store",
+        "escena",
+        "graficas"
+      ]
+    },
+    {
+      "kind": "security-group",
+      "label": "Núcleo de simulación TypeScript",
+      "wraps": [
+        "modelo",
+        "validacion"
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "id": "usuario-ui",
+      "from": "usuario",
+      "to": "ui",
+      "label": "P y fluido",
+      "variant": "emphasis"
+    },
+    {
+      "id": "ui-store",
+      "from": "ui",
+      "to": "store",
+      "label": "acciones"
+    },
+    {
+      "id": "store-modelo",
+      "from": "store",
+      "to": "modelo",
+      "label": "estado"
+    },
+    {
+      "id": "modelo-escena",
+      "from": "modelo",
+      "to": "escena",
+      "label": "campo u(x,t)"
+    },
+    {
+      "id": "modelo-graficas",
+      "from": "modelo",
+      "to": "graficas",
+      "label": "c(P) y error",
+      "labelDy": 44
+    },
+    {
+      "id": "modelo-validacion",
+      "from": "modelo",
+      "to": "validacion",
+      "label": "física base",
+      "labelDy": 34
+    },
+    {
+      "id": "validacion-python",
+      "from": "validacion",
+      "to": "python",
+      "label": "contraste",
+      "labelDy": 34
+    },
+    {
+      "id": "python-artefactos",
+      "from": "python",
+      "to": "artefactos",
+      "label": "reporte"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Interacción",
+      "items": [
+        "Presión, fluido, geometría, ruido y método",
+        "Pestañas de simulación y validación"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Cálculo",
+      "items": [
+        "Hagen-Poiseuille y esfuerzos de pared",
+        "Velocidad acustoelástica e inversión del TOF",
+        "Solver FDTD y Monte Carlo"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Evidencia",
+      "items": [
+        "Contraste TypeScript vs. Python",
+        "Presupuesto de error y figuras"
+      ]
+    }
+  ]
+}

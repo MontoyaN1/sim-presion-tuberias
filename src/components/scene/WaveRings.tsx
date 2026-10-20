@@ -6,18 +6,28 @@ import type { WaveField } from '../../simulation/types'
 interface WaveRingsProps {
   field: WaveField
   amplitude: number
+  color?: string
+  opacity?: number
   count?: number
   length?: number
 }
 
-const RING_RADIUS = 0.62
+const RING_RADIUS = 0.63
 
-export function WaveRings({ field, amplitude, count = 150, length = 6 }: WaveRingsProps) {
+export function WaveRings({
+  field,
+  amplitude,
+  color = '#38bdf8',
+  opacity = 0.3,
+  count = 90,
+  length = 6,
+}: WaveRingsProps) {
   const meshRef = useRef<THREE.InstancedMesh>(null)
   const dummy = useMemo(() => new THREE.Object3D(), [])
-  const color = useMemo(() => new THREE.Color(), [])
+  const scratchColor = useMemo(() => new THREE.Color(), [])
+  const baseColor = useMemo(() => new THREE.Color(color), [color])
   const geometry = useMemo(() => {
-    const next = new THREE.TorusGeometry(RING_RADIUS, 0.022, 8, 48)
+    const next = new THREE.TorusGeometry(RING_RADIUS, 0.007, 8, 48)
     next.rotateY(Math.PI / 2)
     return next
   }, [])
@@ -25,39 +35,39 @@ export function WaveRings({ field, amplitude, count = 150, length = 6 }: WaveRin
     () =>
       new THREE.MeshBasicMaterial({
         transparent: true,
-        opacity: 0.95,
+        opacity,
         blending: THREE.AdditiveBlending,
         depthWrite: false,
         toneMapped: false,
       }),
-    [],
+    [opacity],
   )
 
   useLayoutEffect(() => {
     const mesh = meshRef.current
     if (!mesh) return
-    for (let i = 0; i < count; i++) {
-      color.setRGB(0, 0, 0)
-      mesh.setColorAt(i, color)
+    for (let index = 0; index < count; index += 1) {
+      scratchColor.setRGB(0, 0, 0)
+      mesh.setColorAt(index, scratchColor)
     }
     if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true
-  }, [count, color])
+  }, [count, scratchColor])
 
   useFrame(() => {
     const mesh = meshRef.current
     if (!mesh) return
     const nodes = field.u.length
-    for (let i = 0; i < count; i++) {
-      const node = Math.floor((i / (count - 1)) * (nodes - 1))
+    for (let index = 0; index < count; index += 1) {
+      const node = Math.floor((index / (count - 1)) * (nodes - 1))
       const value = Math.abs(field.u[node]) / amplitude
       const intensity = Math.min(value, 1)
-      const bulge = 1 + Math.min(value, 1.25) * 0.28
-      dummy.position.set((i / (count - 1) - 0.5) * length, 0, 0)
+      const bulge = 1 + Math.min(value, 1.25) * 0.07
+      dummy.position.set((index / (count - 1) - 0.5) * length, 0, 0)
       dummy.scale.set(bulge, bulge, 1)
       dummy.updateMatrix()
-      mesh.setMatrixAt(i, dummy.matrix)
-      color.setRGB(0.18 * intensity, 0.7 * intensity, intensity)
-      mesh.setColorAt(i, color)
+      mesh.setMatrixAt(index, dummy.matrix)
+      scratchColor.copy(baseColor).multiplyScalar(0.08 + intensity * 0.92)
+      mesh.setColorAt(index, scratchColor)
     }
     mesh.instanceMatrix.needsUpdate = true
     if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true
