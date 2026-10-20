@@ -7,15 +7,16 @@ interface PipeAssemblyProps {
   field: WaveField
   amplitude: number
   pressure: number
+  wallColor: string
 }
 
 const PIPE_LENGTH = 6
 
-export function PipeAssembly({ fluid, field, amplitude, pressure }: PipeAssemblyProps) {
+export function PipeAssembly({ fluid, field, amplitude, pressure, wallColor }: PipeAssemblyProps) {
   return (
     <group>
       <FluidColumn fluid={fluid} />
-      <PipeWall />
+      <PipeWall color={wallColor} />
       <Flange x={-3.05} />
       <Flange x={3.05} />
       <Sensor x={-3.05} color="#34d399" />
@@ -45,12 +46,12 @@ function FluidColumn({ fluid }: { fluid: Fluid }) {
   )
 }
 
-function PipeWall() {
+function PipeWall({ color }: { color: string }) {
   return (
     <mesh rotation={[0, 0, Math.PI / 2]}>
       <cylinderGeometry args={[0.6, 0.6, 6, 96, 1, true]} />
       <meshStandardMaterial
-        color="#cbd5e1"
+        color={color}
         metalness={0.9}
         roughness={0.25}
         transparent
