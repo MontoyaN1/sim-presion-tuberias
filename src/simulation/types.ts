@@ -2,6 +2,7 @@ export type FluidId = 'water' | 'crude' | 'hydrogen'
 export type Phase = 'liquid' | 'gas'
 export type MaterialId = 'steel' | 'aluminum' | 'copper'
 export type FlowModel = 'hagen-poiseuille' | 'compressible-isothermal'
+export type BoundaryType = 'absorbing' | 'reflecting'
 
 export interface Fluid {
   id: FluidId
@@ -66,6 +67,7 @@ export interface SolverConfig {
   amplitude: number
   damping: number
   maxPressure: number
+  boundary: BoundaryType
 }
 
 export interface WaveField {

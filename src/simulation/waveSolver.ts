@@ -53,9 +53,13 @@ export function stepWave(
   }
 
   field.uNext[0] = source ? source(field.time + field.dt) : 0
-  field.uNext[n - 1] =
-    field.u[n - 2] +
-    ((courant - 1) / (courant + 1)) * (field.uNext[n - 2] - field.u[n - 1])
+  if (config.boundary === 'reflecting') {
+    field.uNext[n - 1] = 0
+  } else {
+    field.uNext[n - 1] =
+      field.u[n - 2] +
+      ((courant - 1) / (courant + 1)) * (field.uNext[n - 2] - field.u[n - 1])
+  }
 
   const tmp = field.uPrev
   field.uPrev = field.u

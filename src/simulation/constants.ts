@@ -43,6 +43,7 @@ export const DEFAULT_SOLVER: SolverConfig = {
   amplitude: 1e-6,
   damping: 0,
   maxPressure: 20e6,
+  boundary: 'absorbing',
 }
 
 export const GAS_CONSTANT = 8.314462618
