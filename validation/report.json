@@ -1,0 +1,382 @@
+{
+  "config": {
+    "p1": 10000000.0,
+    "p2": 8000000.0,
+    "sectionFraction": 0.5,
+    "trials": 500,
+    "tofNoise": 0.0005,
+    "alphaUncertainty": 0.02,
+    "c0Uncertainty": 0.0002,
+    "seed": 12345,
+    "temperature": 300.0
+  },
+  "python": [
+    {
+      "id": "water",
+      "name": "Agua",
+      "truePressure": 9000000.0,
+      "estimatedPressure": 9003143.025965165,
+      "stats": {
+        "truePressure": 9000000.0,
+        "mean": 9003143.025965165,
+        "std": 310551.65630213416,
+        "bias": 3143.025965165347,
+        "rmse": 310256.8696769704,
+        "mae": 248366.73763246607,
+        "ci95": 608681.2463521829,
+        "relativeError": 0.0003492251072405941
+      },
+      "modelError": 0.0,
+      "totalError": 3143.025965165347,
+      "flow": {
+        "pressureDrop": 2000000.0,
+        "volumetricFlow": 78539.81633974484,
+        "meanVelocity": 2500000.0,
+        "maxVelocity": 5000000.0,
+        "reynolds": 500000000000.0,
+        "laminar": false,
+        "model": "hagen-poiseuille"
+      }
+    },
+    {
+      "id": "crude",
+      "name": "Crudo",
+      "truePressure": 9000000.0,
+      "estimatedPressure": 9003143.025965165,
+      "stats": {
+        "truePressure": 9000000.0,
+        "mean": 9003143.025965165,
+        "std": 310551.65630213416,
+        "bias": 3143.025965165347,
+        "rmse": 310256.8696769704,
+        "mae": 248366.73763246607,
+        "ci95": 608681.2463521829,
+        "relativeError": 0.0003492251072405941
+      },
+      "modelError": 0.0,
+      "totalError": 3143.025965165347,
+      "flow": {
+        "pressureDrop": 2000000.0,
+        "volumetricFlow": 1570.796326794897,
+        "meanVelocity": 50000.00000000001,
+        "maxVelocity": 100000.00000000001,
+        "reynolds": 180000000.00000003,
+        "laminar": false,
+        "model": "hagen-poiseuille"
+      }
+    },
+    {
+      "id": "hydrogen",
+      "name": "Hidrogeno",
+      "truePressure": 9055385.138137417,
+      "estimatedPressure": 9058545.03740317,
+      "stats": {
+        "truePressure": 9055385.138137417,
+        "mean": 9058545.03740317,
+        "std": 311055.6716694625,
+        "bias": 3159.8992657531053,
+        "rmse": 310760.52609582624,
+        "mae": 248773.6408462287,
+        "ci95": 609669.1164721465,
+        "relativeError": 0.00034895249815990246
+      },
+      "modelError": 55385.138137416914,
+      "totalError": 58545.03740317002,
+      "flow": {
+        "pressureDrop": 2000000.0,
+        "volumetricFlow": 8824698.46513987,
+        "meanVelocity": 280898876.4044944,
+        "maxVelocity": 561797752.8089888,
+        "reynolds": 45916374404230.125,
+        "laminar": false,
+        "model": "compressible-isothermal"
+      }
+    }
+  ],
+  "comparison": {
+    "available": true,
+    "passed": true,
+    "maxRelativeDifference": 1.1789269167015861e-12,
+    "details": [
+      {
+        "fluid": "water",
+        "field": "truePressure",
+        "typescript": 9000000.0,
+        "python": 9000000.0,
+        "relativeDifference": 0.0
+      },
+      {
+        "fluid": "water",
+        "field": "estimatedPressure",
+        "typescript": 9003143.025965165,
+        "python": 9003143.025965165,
+        "relativeDifference": 0.0
+      },
+      {
+        "fluid": "water",
+        "field": "stats.mean",
+        "typescript": 9003143.025965165,
+        "python": 9003143.025965165,
+        "relativeDifference": 0.0
+      },
+      {
+        "fluid": "water",
+        "field": "stats.std",
+        "typescript": 310551.65630213416,
+        "python": 310551.65630213416,
+        "relativeDifference": 0.0
+      },
+      {
+        "fluid": "water",
+        "field": "stats.bias",
+        "typescript": 3143.025965165347,
+        "python": 3143.025965165347,
+        "relativeDifference": 0.0
+      },
+      {
+        "fluid": "water",
+        "field": "stats.rmse",
+        "typescript": 310256.86967697024,
+        "python": 310256.8696769704,
+        "relativeDifference": 5.628335737487912e-16
+      },
+      {
+        "fluid": "water",
+        "field": "stats.mae",
+        "typescript": 248366.73763246622,
+        "python": 248366.73763246607,
+        "relativeDifference": 5.859043512461325e-16
+      },
+      {
+        "fluid": "water",
+        "field": "stats.ci95",
+        "typescript": 608681.2463521829,
+        "python": 608681.2463521829,
+        "relativeDifference": 0.0
+      },
+      {
+        "fluid": "water",
+        "field": "modelError",
+        "typescript": 0.0,
+        "python": 0.0,
+        "relativeDifference": 0.0
+      },
+      {
+        "fluid": "water",
+        "field": "totalError",
+        "typescript": 3143.025965165347,
+        "python": 3143.025965165347,
+        "relativeDifference": 0.0
+      },
+      {
+        "fluid": "water",
+        "field": "flow.reynolds",
+        "typescript": 500000000000.0,
+        "python": 500000000000.0,
+        "relativeDifference": 0.0
+      },
+      {
+        "fluid": "water",
+        "field": "flow.laminar",
+        "typescript": false,
+        "python": false,
+        "equal": true
+      },
+      {
+        "fluid": "water",
+        "field": "flow.model",
+        "typescript": "hagen-poiseuille",
+        "python": "hagen-poiseuille",
+        "equal": true
+      },
+      {
+        "fluid": "crude",
+        "field": "truePressure",
+        "typescript": 9000000.0,
+        "python": 9000000.0,
+        "relativeDifference": 0.0
+      },
+      {
+        "fluid": "crude",
+        "field": "estimatedPressure",
+        "typescript": 9003143.025965165,
+        "python": 9003143.025965165,
+        "relativeDifference": 0.0
+      },
+      {
+        "fluid": "crude",
+        "field": "stats.mean",
+        "typescript": 9003143.025965165,
+        "python": 9003143.025965165,
+        "relativeDifference": 0.0
+      },
+      {
+        "fluid": "crude",
+        "field": "stats.std",
+        "typescript": 310551.65630213416,
+        "python": 310551.65630213416,
+        "relativeDifference": 0.0
+      },
+      {
+        "fluid": "crude",
+        "field": "stats.bias",
+        "typescript": 3143.025965165347,
+        "python": 3143.025965165347,
+        "relativeDifference": 0.0
+      },
+      {
+        "fluid": "crude",
+        "field": "stats.rmse",
+        "typescript": 310256.86967697024,
+        "python": 310256.8696769704,
+        "relativeDifference": 5.628335737487912e-16
+      },
+      {
+        "fluid": "crude",
+        "field": "stats.mae",
+        "typescript": 248366.73763246622,
+        "python": 248366.73763246607,
+        "relativeDifference": 5.859043512461325e-16
+      },
+      {
+        "fluid": "crude",
+        "field": "stats.ci95",
+        "typescript": 608681.2463521829,
+        "python": 608681.2463521829,
+        "relativeDifference": 0.0
+      },
+      {
+        "fluid": "crude",
+        "field": "modelError",
+        "typescript": 0.0,
+        "python": 0.0,
+        "relativeDifference": 0.0
+      },
+      {
+        "fluid": "crude",
+        "field": "totalError",
+        "typescript": 3143.025965165347,
+        "python": 3143.025965165347,
+        "relativeDifference": 0.0
+      },
+      {
+        "fluid": "crude",
+        "field": "flow.reynolds",
+        "typescript": 180000000.00000003,
+        "python": 180000000.00000003,
+        "relativeDifference": 0.0
+      },
+      {
+        "fluid": "crude",
+        "field": "flow.laminar",
+        "typescript": false,
+        "python": false,
+        "equal": true
+      },
+      {
+        "fluid": "crude",
+        "field": "flow.model",
+        "typescript": "hagen-poiseuille",
+        "python": "hagen-poiseuille",
+        "equal": true
+      },
+      {
+        "fluid": "hydrogen",
+        "field": "truePressure",
+        "typescript": 9055385.138137417,
+        "python": 9055385.138137417,
+        "relativeDifference": 0.0
+      },
+      {
+        "fluid": "hydrogen",
+        "field": "estimatedPressure",
+        "typescript": 9058545.037403166,
+        "python": 9058545.03740317,
+        "relativeDifference": 4.1124598741630256e-16
+      },
+      {
+        "fluid": "hydrogen",
+        "field": "stats.mean",
+        "typescript": 9058545.037403166,
+        "python": 9058545.03740317,
+        "relativeDifference": 4.1124598741630256e-16
+      },
+      {
+        "fluid": "hydrogen",
+        "field": "stats.std",
+        "typescript": 311055.6716694625,
+        "python": 311055.6716694625,
+        "relativeDifference": 0.0
+      },
+      {
+        "fluid": "hydrogen",
+        "field": "stats.bias",
+        "typescript": 3159.89926574938,
+        "python": 3159.8992657531053,
+        "relativeDifference": 1.1789269167015861e-12
+      },
+      {
+        "fluid": "hydrogen",
+        "field": "stats.rmse",
+        "typescript": 310760.5260958262,
+        "python": 310760.52609582624,
+        "relativeDifference": 1.8730712566601355e-16
+      },
+      {
+        "fluid": "hydrogen",
+        "field": "stats.mae",
+        "typescript": 248773.64084622898,
+        "python": 248773.6408462287,
+        "relativeDifference": 1.1698920495649799e-15
+      },
+      {
+        "fluid": "hydrogen",
+        "field": "stats.ci95",
+        "typescript": 609669.1164721465,
+        "python": 609669.1164721465,
+        "relativeDifference": 0.0
+      },
+      {
+        "fluid": "hydrogen",
+        "field": "modelError",
+        "typescript": 55385.138137416914,
+        "python": 55385.138137416914,
+        "relativeDifference": 0.0
+      },
+      {
+        "fluid": "hydrogen",
+        "field": "totalError",
+        "typescript": 58545.037403166294,
+        "python": 58545.03740317002,
+        "relativeDifference": 6.363118829026834e-14
+      },
+      {
+        "fluid": "hydrogen",
+        "field": "flow.reynolds",
+        "typescript": 45916374404230.125,
+        "python": 45916374404230.125,
+        "relativeDifference": 0.0
+      },
+      {
+        "fluid": "hydrogen",
+        "field": "flow.laminar",
+        "typescript": false,
+        "python": false,
+        "equal": true
+      },
+      {
+        "fluid": "hydrogen",
+        "field": "flow.model",
+        "typescript": "compressible-isothermal",
+        "python": "compressible-isothermal",
+        "equal": true
+      }
+    ],
+    "message": "OK"
+  },
+  "figures": [
+    "validation/pressure_vs_estimate.png",
+    "validation/error_histograms.png",
+    "validation/error_budget.png"
+  ]
+}

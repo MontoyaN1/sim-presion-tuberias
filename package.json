@@ -9,6 +9,8 @@
     "lint": "oxlint",
     "test": "vitest run",
     "test:watch": "vitest",
+    "validate": "vitest run tests/validation-export.test.ts && python3 validation/compare.py",
+    "validate:python": "python3 validation/compare.py",
     "preview": "vite preview"
   },
   "dependencies": {

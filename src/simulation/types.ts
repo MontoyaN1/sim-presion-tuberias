@@ -127,6 +127,12 @@ export interface FluidValidationOptions {
   temperature?: number
 }
 
+export interface ErrorBudgetPhase {
+  phase: string
+  contribution: number
+  cumulative: number
+}
+
 export interface FluidValidationResult {
   fluid: Fluid
   truePressure: number
