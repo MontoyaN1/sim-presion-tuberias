@@ -7,6 +7,9 @@ export default defineConfig({
   server: {
     port: 3010,
     strictPort: true,
+    proxy: {
+      '/api': 'http://127.0.0.1:3001',
+    },
   },
   test: {
     environment: 'node',

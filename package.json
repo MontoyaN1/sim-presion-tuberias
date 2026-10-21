@@ -4,14 +4,17 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "concurrently -k -n api,web -c magenta,cyan \"npm:dev:api\" \"npm:dev:web\"",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "test": "vitest run",
     "test:watch": "vitest",
     "validate": "vitest run tests/validation-export.test.ts && python3 validation/compare.py",
     "validate:python": "python3 validation/compare.py",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "dev:api": "node server/index.mjs",
+    "dev:web": "vite",
+    "start": "node server/index.mjs"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.9",
@@ -29,6 +32,7 @@
     "@types/react-dom": "^19.3.0",
     "@types/three": "^0.186.0",
     "@vitejs/plugin-react": "^6.1.2",
+    "concurrently": "^10.0.6",
     "oxlint": "^1.88.0",
     "tailwindcss": "^4.3.3",
     "typescript": "~6.0.3",

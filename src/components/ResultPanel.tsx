@@ -1,4 +1,7 @@
+import { useState } from 'react'
+import { saveMeasurement } from '../api/metrics'
 import { useSimulationModel } from '../hooks/useSimulationModel'
+import { useSimulationStore } from '../store/simulationStore'
 
 const MAX_PRESSURE = 10e6
 
@@ -116,8 +119,12 @@ function Chip({ label, value }: { label: string; value: string }) {
 }
 
 export function ResultPanel() {
-  const { pressure, estimated, error, relativeError, acoustic, tof, method, amplification, material } =
+  const { fluid, pressure, estimated, error, relativeError, acoustic, tof, method, amplification, material, geometry, mechanical, phase, phaseShift } =
     useSimulationModel()
+  const boundary = useSimulationStore((state) => state.boundary)
+  const noise = useSimulationStore((state) => state.noise)
+  const [saveState, setSaveState] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
+  const [saveError, setSaveError] = useState('')
 
   const errorPercent = relativeError * 100
   const absoluteError = Math.abs(errorPercent)
@@ -127,6 +134,38 @@ export function ResultPanel() {
     ? `×${amplification.toFixed(0)}`
     : '—'
   const sign = error >= 0 ? '+' : ''
+
+  async function handleSave() {
+    setSaveState('saving')
+    setSaveError('')
+    try {
+      await saveMeasurement({
+        label: `Medición ${fluid.name} · ${(pressure / 1e6).toFixed(2)} MPa`,
+        fluidId: fluid.id,
+        materialId: material.id,
+        pressurePa: pressure,
+        estimatedPressurePa: estimated,
+        errorPa: error,
+        relativeError,
+        tofS: tof,
+        waveSpeedMps: acoustic.waveSpeed,
+        referenceSpeedMps: acoustic.referenceSpeed,
+        phaseRad: phase,
+        phaseShiftRad: phaseShift,
+        hoopStressPa: mechanical.hoopStress,
+        method,
+        noise,
+        innerRadiusM: geometry.innerRadius,
+        wallThicknessM: geometry.wallThickness,
+        boundary,
+        amplification: Number.isFinite(amplification) ? amplification : null,
+      })
+      setSaveState('saved')
+    } catch (saveFailure) {
+      setSaveState('error')
+      setSaveError(saveFailure instanceof Error ? saveFailure.message : 'No se pudo guardar')
+    }
+  }
 
   return (
     <section
@@ -185,6 +224,24 @@ export function ResultPanel() {
         <Chip label="TOF" value={`${(tof * 1e6).toFixed(2)} µs`} />
         <Chip label="c(P)" value={`${acoustic.waveSpeed.toFixed(0)} m/s`} />
         <Chip label="Amplif." value={amplificationText} />
+      </div>
+
+      <div className="mt-4 flex flex-wrap items-center gap-2">
+        <button
+          type="button"
+          onClick={() => void handleSave()}
+          disabled={saveState === 'saving'}
+          className="w-full rounded-lg bg-sky-500 px-3 py-2 text-sm font-semibold text-slate-950 transition hover:bg-sky-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 disabled:cursor-wait disabled:opacity-60 sm:w-auto"
+        >
+          {saveState === 'saving' ? 'Guardando…' : 'Guardar medición'}
+        </button>
+        <span
+          className={`text-xs ${saveState === 'error' ? 'text-rose-300' : 'text-slate-500'}`}
+          aria-live="polite"
+        >
+          {saveState === 'saved' && 'Guardada en SQLite'}
+          {saveState === 'error' && saveError}
+        </span>
       </div>
     </section>
   )

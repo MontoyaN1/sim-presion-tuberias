@@ -1,5 +1,6 @@
 import { ControlPanel } from './ControlPanel'
 import { DidacticPanel } from './DidacticPanel'
+import { HistoryPanel } from './HistoryPanel'
 import { PipeScene } from './scene/PipeScene'
 import { PressureChart } from './PressureChart'
 import { ReadoutPanel } from './ReadoutPanel'
@@ -15,8 +16,8 @@ export function SimulationView() {
         <div className="order-4">
           <PressureChart />
         </div>
-        <div className="order-6">
-          <DidacticPanel />
+        <div className="order-5">
+          <ReadoutPanel />
         </div>
       </div>
 
@@ -27,8 +28,11 @@ export function SimulationView() {
         <div className="order-3">
           <ControlPanel />
         </div>
-        <div className="order-5">
-          <ReadoutPanel />
+        <div className="order-6">
+          <DidacticPanel />
+        </div>
+        <div className="order-7">
+          <HistoryPanel />
         </div>
       </div>
     </div>
