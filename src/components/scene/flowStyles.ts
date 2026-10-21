@@ -10,6 +10,14 @@ export interface ParticleStyle {
   turbulence: number
 }
 
+export interface FluidPatternStyle {
+  opacity: number
+  speed: number
+  repeat: [number, number]
+  blending: 'normal' | 'additive'
+  kind: 'caustics' | 'viscous' | 'gas'
+}
+
 export interface FluidVisualStyle {
   color: string
   emissive: string
@@ -21,6 +29,7 @@ export interface FluidVisualStyle {
   ringColor: string
   pulseColor: string
   pulseDuration: number
+  pattern: FluidPatternStyle
   particles: ParticleStyle
 }
 
@@ -36,6 +45,13 @@ export const FLUID_VISUALS: Record<FluidId, FluidVisualStyle> = {
     ringColor: '#38bdf8',
     pulseColor: '#7dd3fc',
     pulseDuration: 1.3,
+    pattern: {
+      opacity: 0.5,
+      speed: 0.09,
+      repeat: [1.4, 2.4],
+      blending: 'additive',
+      kind: 'caustics',
+    },
     particles: {
       count: 320,
       color: '#bae6fd',
@@ -57,6 +73,13 @@ export const FLUID_VISUALS: Record<FluidId, FluidVisualStyle> = {
     ringColor: '#f59e0b',
     pulseColor: '#fbbf24',
     pulseDuration: 2.4,
+    pattern: {
+      opacity: 0.62,
+      speed: 0.025,
+      repeat: [1, 2],
+      blending: 'normal',
+      kind: 'viscous',
+    },
     particles: {
       count: 110,
       color: '#d97706',
@@ -78,6 +101,13 @@ export const FLUID_VISUALS: Record<FluidId, FluidVisualStyle> = {
     ringColor: '#4ade80',
     pulseColor: '#bbf7d0',
     pulseDuration: 0.9,
+    pattern: {
+      opacity: 0.26,
+      speed: 0.22,
+      repeat: [2, 5],
+      blending: 'additive',
+      kind: 'gas',
+    },
     particles: {
       count: 300,
       color: '#d9f99d',

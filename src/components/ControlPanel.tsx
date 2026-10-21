@@ -41,7 +41,7 @@ export function ControlPanel() {
   const reset = useSimulationStore((state) => state.reset)
 
   return (
-    <section className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5 shadow-2xl shadow-black/30">
+    <section className="self-start rounded-2xl border border-slate-800 bg-slate-900/60 p-5 shadow-2xl shadow-black/30">
       <h2 className="text-xs font-semibold uppercase tracking-widest text-slate-400">
         Controles
       </h2>

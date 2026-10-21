@@ -1,6 +1,6 @@
 import { ContactShadows, Grid, OrbitControls } from '@react-three/drei'
-import { Canvas, useFrame } from '@react-three/fiber'
-import { useMemo } from 'react'
+import { Canvas, useFrame, useThree } from '@react-three/fiber'
+import { useEffect, useMemo } from 'react'
 import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion'
 import { useSimulationModel } from '../../hooks/useSimulationModel'
 import { DEFAULT_SOLVER, gaussianPulse, stepWave, waveSpeedAtPressure } from '../../simulation'
@@ -10,6 +10,21 @@ import { PipeAssembly } from './PipeAssembly'
 
 const NODES = 600
 const STEPS_PER_FRAME = 8
+
+function ResponsiveCamera() {
+  const camera = useThree((state) => state.camera)
+  const size = useThree((state) => state.size)
+
+  useEffect(() => {
+    const aspect = size.width / Math.max(size.height, 1)
+    const factor = aspect < 1 ? 1.3 : 1
+    camera.position.set(6.9 * factor, 4.1 * factor, 8.3 * factor)
+    camera.lookAt(0, 0.2, 0)
+    camera.updateProjectionMatrix()
+  }, [camera, size])
+
+  return null
+}
 
 const WALL_COLORS: Record<MaterialId, string> = {
   steel: '#cbd5e1',
@@ -72,14 +87,25 @@ export function PipeScene() {
         role="img"
         aria-label="Tubería 3D con cuatro sensores diagonales, dos emisores verdes y dos receptores ámbar, y dos haces ultrasónicos cruzados."
       >
-        <Canvas camera={{ position: [5.4, 3.3, 6.4], fov: 42 }} dpr={[1, 2]}>
+        <Canvas camera={{ position: [6.9, 4.1, 8.3], fov: 40 }} dpr={[1, 2]}>
+          <ResponsiveCamera />
           <color attach="background" args={['#040a16']} />
           <fog attach="fog" args={['#040a16', 9, 26]} />
-          <ambientLight intensity={0.35} />
-          <directionalLight position={[6, 9, 5]} intensity={2.0} color="#f8fafc" />
-          <directionalLight position={[-6, 5, -5]} intensity={1.1} color="#38bdf8" />
+          <ambientLight intensity={0.28} />
+          <hemisphereLight args={['#bae6fd', '#020617', 0.5]} />
+          <directionalLight position={[6, 9, 5]} intensity={2.2} color="#f8fafc" />
+          <directionalLight position={[-6, 5, -5]} intensity={1.2} color="#38bdf8" />
+          <spotLight
+            position={[-3, 7, 4]}
+            angle={0.55}
+            penumbra={1}
+            intensity={38}
+            distance={20}
+            color="#e0f2fe"
+          />
           <pointLight position={[0, 3, 3.5]} intensity={22} distance={16} color="#e0f2fe" />
           <pointLight position={[-3, -1.5, 3]} intensity={8} distance={10} color="#f59e0b" />
+          <pointLight position={[3, 1.2, -2.5]} intensity={12} distance={12} color="#a78bfa" />
 
           <SimulationDriver
             field={field}
@@ -123,37 +149,47 @@ export function PipeScene() {
 
           <OrbitControls
             enablePan={false}
-            minDistance={4}
-            maxDistance={16}
+            minDistance={5}
+            maxDistance={20}
             minPolarAngle={Math.PI * 0.18}
             maxPolarAngle={Math.PI * 0.55}
-            target={[0, 0.35, 0]}
+            target={[0, 0.2, 0]}
             enableDamping
             dampingFactor={0.08}
             makeDefault
           />
         </Canvas>
 
-        <div className="pointer-events-none absolute left-4 top-4 rounded-xl border border-slate-700/60 bg-slate-950/70 px-4 py-3 backdrop-blur">
-          <div className="text-xs uppercase tracking-widest text-slate-500">Presión</div>
-          <div className="font-mono text-2xl font-semibold text-sky-300">
-            {(pressure / 1e6).toFixed(1)} MPa
+        <div className="pointer-events-none absolute inset-x-3 top-3 flex items-start justify-between gap-2 sm:inset-x-4 sm:top-4">
+          <div className="min-w-0 rounded-xl border border-slate-700/60 bg-slate-950/70 px-3 py-2 backdrop-blur sm:px-4 sm:py-3">
+            <div className="text-[10px] uppercase tracking-widest text-slate-500 sm:text-xs">
+              Presión
+            </div>
+            <div className="whitespace-nowrap font-mono text-lg font-semibold text-sky-300 sm:text-2xl">
+              {(pressure / 1e6).toFixed(1)} MPa
+            </div>
+            <div className="mt-1 truncate text-xs text-slate-400 sm:text-sm">
+              {fluid.name} · {material.name}
+            </div>
+            <div className="mt-1 text-[9px] uppercase tracking-wider text-emerald-400/80 sm:text-[10px]">
+              4 sensores · 2E / 2R
+            </div>
           </div>
-          <div className="mt-1 text-sm text-slate-400">
-            {fluid.name} · {material.name}
-          </div>
-          <div className="mt-1 text-[10px] uppercase tracking-wider text-emerald-400/80">
-            4 sensores · 2E / 2R
-          </div>
-        </div>
 
-        <div className="pointer-events-none absolute right-4 top-4 space-y-1 rounded-xl border border-slate-700/60 bg-slate-950/70 px-4 py-3 text-right backdrop-blur">
-          <div className="text-xs uppercase tracking-widest text-slate-500">c(P)</div>
-          <div className="font-mono text-lg text-emerald-300">
-            {acoustic.waveSpeed.toFixed(1)} m/s
+          <div className="min-w-0 space-y-1 rounded-xl border border-slate-700/60 bg-slate-950/70 px-3 py-2 text-right backdrop-blur sm:px-4 sm:py-3">
+            <div className="text-[10px] uppercase tracking-widest text-slate-500 sm:text-xs">
+              c(P)
+            </div>
+            <div className="whitespace-nowrap font-mono text-sm text-emerald-300 sm:text-lg">
+              {acoustic.waveSpeed.toFixed(1)} m/s
+            </div>
+            <div className="text-[10px] uppercase tracking-widest text-slate-500 sm:text-xs">
+              TOF
+            </div>
+            <div className="whitespace-nowrap font-mono text-sm text-amber-300 sm:text-lg">
+              {(tof * 1e6).toFixed(2)} µs
+            </div>
           </div>
-          <div className="text-xs uppercase tracking-widest text-slate-500">TOF</div>
-          <div className="font-mono text-lg text-amber-300">{(tof * 1e6).toFixed(2)} µs</div>
         </div>
 
         <div className="pointer-events-none absolute bottom-3 left-4 hidden text-xs text-slate-500 sm:block">

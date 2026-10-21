@@ -4,6 +4,7 @@ import * as THREE from 'three'
 import type { FluidVisualStyle } from './flowStyles'
 
 const BEAM_RADIUS = 0.5
+const WAVEFRONT_COUNT = 9
 
 function beamPoint(x: number, angle: number): [number, number, number] {
   return [x, BEAM_RADIUS * Math.cos(angle), BEAM_RADIUS * Math.sin(angle)]
@@ -59,13 +60,21 @@ function Beam({
     () => new THREE.LineCurve3(new THREE.Vector3(...from), new THREE.Vector3(...to)),
     [from, to],
   )
+  const direction = useMemo(
+    () => new THREE.Vector3(...to).sub(new THREE.Vector3(...from)).normalize(),
+    [from, to],
+  )
+  const orientation = useMemo(
+    () => new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 0, 1), direction),
+    [direction],
+  )
 
-  const line = useMemo(() => {
-    const geometry = new THREE.BufferGeometry().setFromPoints(curve.getPoints(32))
+  const guide = useMemo(() => {
+    const geometry = new THREE.BufferGeometry().setFromPoints(curve.getPoints(40))
     const material = new THREE.LineBasicMaterial({
       color,
       transparent: true,
-      opacity: 0.3,
+      opacity: 0.12,
       depthWrite: false,
       blending: THREE.AdditiveBlending,
       toneMapped: false,
@@ -75,65 +84,53 @@ function Beam({
 
   useEffect(
     () => () => {
-      line.geometry.dispose()
-      ;(line.material as THREE.Material).dispose()
+      guide.geometry.dispose()
+      ;(guide.material as THREE.Material).dispose()
     },
-    [line],
+    [guide],
   )
 
-  const headRef = useRef<THREE.Mesh>(null)
-  const midRef = useRef<THREE.Mesh>(null)
-  const tailRef = useRef<THREE.Mesh>(null)
-  const lightRef = useRef<THREE.PointLight>(null)
+  const rings = useRef<THREE.Mesh[]>([])
 
   useFrame((state) => {
-    const t = ((state.clock.elapsedTime * motionScale) / duration) % 1
-    const head = curve.getPoint(t)
-    const mid = curve.getPoint(Math.max(0, t - 0.035))
-    const tail = curve.getPoint(Math.max(0, t - 0.07))
-    headRef.current?.position.copy(head)
-    midRef.current?.position.copy(mid)
-    tailRef.current?.position.copy(tail)
-    lightRef.current?.position.copy(head)
+    const head = ((state.clock.elapsedTime * motionScale) / duration) % 1
+
+    rings.current.forEach((ring, index) => {
+      if (!ring) return
+      const travel = ((head - index * 0.055) % 1 + 1) % 1
+      const point = curve.getPoint(travel)
+      const radius = 0.055 + index * 0.0075 + travel * 0.025
+      const fade = Math.max(0, 1 - index / WAVEFRONT_COUNT)
+      ring.position.copy(point)
+      ring.quaternion.copy(orientation)
+      ring.scale.setScalar(radius)
+      const material = ring.material as THREE.MeshBasicMaterial
+      material.opacity = fade * 0.52
+    })
   })
 
   return (
     <>
-      <primitive object={line} />
-      <mesh ref={headRef}>
-        <sphereGeometry args={[0.05, 16, 16]} />
-        <meshBasicMaterial
-          color={color}
-          toneMapped={false}
-          transparent
-          opacity={0.95}
-          blending={THREE.AdditiveBlending}
-          depthWrite={false}
-        />
-      </mesh>
-      <mesh ref={midRef}>
-        <sphereGeometry args={[0.032, 12, 12]} />
-        <meshBasicMaterial
-          color={color}
-          toneMapped={false}
-          transparent
-          opacity={0.5}
-          blending={THREE.AdditiveBlending}
-          depthWrite={false}
-        />
-      </mesh>
-      <mesh ref={tailRef}>
-        <sphereGeometry args={[0.018, 10, 10]} />
-        <meshBasicMaterial
-          color={color}
-          toneMapped={false}
-          transparent
-          opacity={0.25}
-          blending={THREE.AdditiveBlending}
-          depthWrite={false}
-        />
-      </mesh>
-      <pointLight ref={lightRef} color={color} intensity={2.2} distance={1.8} />
+      <primitive object={guide} />
+      {Array.from({ length: WAVEFRONT_COUNT }).map((_, index) => (
+        <mesh
+          key={index}
+          ref={(node) => {
+            if (node) rings.current[index] = node
+          }}
+          renderOrder={3}
+        >
+          <torusGeometry args={[1, 0.032, 8, 48]} />
+          <meshBasicMaterial
+            color={color}
+            transparent
+            opacity={0}
+            blending={THREE.AdditiveBlending}
+            depthWrite={false}
+            toneMapped={false}
+          />
+        </mesh>
+      ))}
     </>
   )
 }

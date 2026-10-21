@@ -24,28 +24,16 @@ export function ReadoutPanel() {
     tof,
     phase,
     phaseShift,
-    pressure,
-    method,
-    estimated,
-    error,
-    relativeError,
     amplification,
   } = useSimulationModel()
 
-  const errorPercent = relativeError * 100
-  const errorClass =
-    Math.abs(errorPercent) > 5
-      ? 'text-rose-400'
-      : Math.abs(errorPercent) > 2
-        ? 'text-amber-300'
-        : 'text-emerald-300'
   const amplificationText = Number.isFinite(amplification)
     ? `×${amplification.toFixed(0)}`
     : '—'
   const sign = (value: number) => (value >= 0 ? '+' : '')
 
   return (
-    <section className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5 shadow-2xl shadow-black/30">
+    <section className="self-start rounded-2xl border border-slate-800 bg-slate-900/60 p-5 shadow-2xl shadow-black/30">
       <h2 className="text-xs font-semibold uppercase tracking-widest text-slate-400">
         Lecturas
       </h2>
@@ -94,30 +82,6 @@ export function ReadoutPanel() {
           accent="text-rose-300"
         />
       </div>
-
-      <div className="mt-3 rounded-xl border border-slate-800 bg-slate-950/70 p-3">
-        <div className="flex items-center justify-between text-sm">
-          <span className="text-slate-400">P real</span>
-          <span className="font-mono text-slate-200">{(pressure / 1e6).toFixed(2)} MPa</span>
-        </div>
-        <div className="mt-1 flex items-center justify-between text-sm">
-          <span className="text-slate-400">
-            P̂ ({method === 'tof' ? 'TOF' : 'desfase'})
-          </span>
-          <span className="font-mono text-sky-300">{(estimated / 1e6).toFixed(2)} MPa</span>
-        </div>
-        <div className="mt-2 flex items-center justify-between border-t border-slate-800 pt-2 text-sm">
-          <span className="text-slate-400">Error</span>
-          <span className={`font-mono font-semibold ${errorClass}`}>
-            {(error / 1e6).toFixed(2)} MPa ({errorPercent.toFixed(1)} %)
-          </span>
-        </div>
-      </div>
-
-      <p className="mt-3 text-xs leading-relaxed text-slate-500">
-        La inversión amplifica el error de velocidad por 1/(ασθ) ≈ {amplificationText}. Por eso un
-        error de 0.1 % en TOF puede convertirse en ~10 % en presión.
-      </p>
     </section>
   )
 }

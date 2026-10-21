@@ -2,6 +2,7 @@ import { useEffect, useMemo } from 'react'
 import * as THREE from 'three'
 import type { Fluid, WaveField } from '../../simulation/types'
 import { BeamPaths } from './BeamPaths'
+import { FluidPattern } from './FluidPattern'
 import { FlowParticles } from './FlowParticles'
 import { FLUID_VISUALS } from './flowStyles'
 import type { FluidVisualStyle } from './flowStyles'
@@ -73,6 +74,7 @@ export function PipeAssembly({
   return (
     <group>
       <FluidColumn fluid={fluid} style={style} />
+      <FluidPattern fluidId={fluid.id} style={style} motionScale={motionScale} />
       <FlowParticles style={style.particles} length={PIPE_LENGTH - 0.4} motionScale={motionScale} />
       <PipeWall color={wallColor} />
       <InnerWall />
@@ -81,11 +83,17 @@ export function PipeAssembly({
       <Flange x={3.05} />
       <Support x={-2.4} />
       <Support x={2.4} />
+      <BaseSkid />
       <ClampBand x={-1.2} />
       <ClampBand x={1.2} />
+      <Valve x={2.05} />
+      <WarningBand x={-2.25} />
+      <Nameplate x={-1.85} />
       {SENSORS.map((sensor) => (
         <Transducer key={sensor.id} {...sensor} />
       ))}
+      <CableRun />
+      <ControlBox />
       <BeamPaths style={style} motionScale={motionScale} />
       <GaugeStem />
       <Manometer pressure={pressure} />
@@ -94,8 +102,8 @@ export function PipeAssembly({
         amplitude={amplitude}
         length={PIPE_LENGTH}
         color={style.ringColor}
-        opacity={0.09}
-        count={36}
+        opacity={0.055}
+        count={28}
       />
     </group>
   )
@@ -232,6 +240,29 @@ function Support({ x }: { x: number }) {
         <boxGeometry args={[0.26, 0.06, 0.86]} />
         <meshStandardMaterial color="#0f172a" roughness={0.9} />
       </mesh>
+    </group>
+  )
+}
+
+function BaseSkid() {
+  return (
+    <group position={[0, -1.34, 0]}>
+      <mesh>
+        <boxGeometry args={[6.5, 0.08, 1.02]} />
+        <meshStandardMaterial color="#0f172a" metalness={0.55} roughness={0.65} />
+      </mesh>
+      {[-0.43, 0.43].map((z) => (
+        <mesh key={z} position={[0, 0.06, z]}>
+          <boxGeometry args={[6.5, 0.04, 0.07]} />
+          <meshStandardMaterial color="#334155" metalness={0.8} roughness={0.35} />
+        </mesh>
+      ))}
+      {[-3.16, 3.16].map((x) => (
+        <mesh key={x} position={[x, 0.09, 0]}>
+          <boxGeometry args={[0.1, 0.14, 1.02]} />
+          <meshStandardMaterial color="#475569" metalness={0.8} roughness={0.3} />
+        </mesh>
+      ))}
     </group>
   )
 }
@@ -423,6 +454,225 @@ function Manometer({ pressure }: { pressure: number }) {
       <mesh position={[0, 0, 0.09]} rotation={[Math.PI / 2, 0, 0]}>
         <cylinderGeometry args={[0.05, 0.05, 0.03, 24]} />
         <meshStandardMaterial color="#1e293b" metalness={0.8} roughness={0.3} />
+      </mesh>
+    </group>
+  )
+}
+
+
+function Valve({ x }: { x: number }) {
+  return (
+    <group position={[x, 0, 0]}>
+      <mesh rotation={[0, 0, Math.PI / 2]}>
+        <cylinderGeometry args={[0.66, 0.66, 0.48, 48]} />
+        <meshStandardMaterial color="#334155" metalness={0.85} roughness={0.3} />
+      </mesh>
+      {[-0.26, 0.26].map((offset) => (
+        <mesh key={offset} position={[offset, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
+          <cylinderGeometry args={[0.7, 0.7, 0.08, 48]} />
+          <meshStandardMaterial color="#475569" metalness={0.85} roughness={0.3} />
+        </mesh>
+      ))}
+      <mesh position={[0, 0.62, 0]}>
+        <cylinderGeometry args={[0.12, 0.16, 0.24, 20]} />
+        <meshStandardMaterial color="#475569" metalness={0.85} roughness={0.3} />
+      </mesh>
+      <mesh position={[0, 0.98, 0]}>
+        <cylinderGeometry args={[0.035, 0.035, 0.55, 12]} />
+        <meshStandardMaterial color="#94a3b8" metalness={0.9} roughness={0.25} />
+      </mesh>
+      <mesh position={[0, 1.26, 0]} rotation={[Math.PI / 2, 0, 0]}>
+        <torusGeometry args={[0.2, 0.028, 10, 32]} />
+        <meshStandardMaterial color="#dc2626" metalness={0.5} roughness={0.4} />
+      </mesh>
+      {[0, Math.PI / 2].map((angle) => (
+        <mesh key={angle} position={[0, 1.26, 0]} rotation={[0, angle, 0]}>
+          <boxGeometry args={[0.38, 0.018, 0.018]} />
+          <meshStandardMaterial color="#dc2626" metalness={0.5} roughness={0.4} />
+        </mesh>
+      ))}
+      <mesh position={[0, 1.26, 0]} rotation={[Math.PI / 2, 0, 0]}>
+        <cylinderGeometry args={[0.045, 0.045, 0.09, 16]} />
+        <meshStandardMaterial color="#7f1d1d" metalness={0.7} roughness={0.35} />
+      </mesh>
+    </group>
+  )
+}
+
+function createWarningTexture(): THREE.CanvasTexture {
+  const canvas = document.createElement('canvas')
+  canvas.width = 256
+  canvas.height = 128
+  const context = canvas.getContext('2d')
+  if (context) {
+    context.fillStyle = '#facc15'
+    context.fillRect(0, 0, canvas.width, canvas.height)
+    context.strokeStyle = '#111827'
+    context.lineWidth = 28
+    for (let offset = -canvas.height; offset < canvas.width + canvas.height; offset += 56) {
+      context.beginPath()
+      context.moveTo(offset, 0)
+      context.lineTo(offset + canvas.height, canvas.height)
+      context.stroke()
+    }
+  }
+  const texture = new THREE.CanvasTexture(canvas)
+  texture.colorSpace = THREE.SRGBColorSpace
+  texture.wrapS = THREE.RepeatWrapping
+  texture.repeat.set(4, 1)
+  texture.needsUpdate = true
+  return texture
+}
+
+function WarningBand({ x }: { x: number }) {
+  const texture = useMemo(() => createWarningTexture(), [])
+  useEffect(
+    () => () => {
+      texture.dispose()
+    },
+    [texture],
+  )
+
+  return (
+    <mesh position={[x, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
+      <cylinderGeometry args={[0.607, 0.607, 0.16, 64, 1, true]} />
+      <meshStandardMaterial map={texture} metalness={0.35} roughness={0.6} side={THREE.DoubleSide} />
+    </mesh>
+  )
+}
+
+function createNameplateTexture(): THREE.CanvasTexture {
+  const canvas = document.createElement('canvas')
+  canvas.width = 512
+  canvas.height = 160
+  const context = canvas.getContext('2d')
+  if (context) {
+    context.fillStyle = '#0f172a'
+    context.fillRect(0, 0, canvas.width, canvas.height)
+    context.strokeStyle = '#94a3b8'
+    context.lineWidth = 6
+    context.strokeRect(8, 8, canvas.width - 16, canvas.height - 16)
+    context.fillStyle = '#e2e8f0'
+    context.font = '700 48px ui-monospace, SFMono-Regular, Menlo, monospace'
+    context.textAlign = 'center'
+    context.textBaseline = 'middle'
+    context.fillText('DN 80 · PN 40', canvas.width / 2, 62)
+    context.fillStyle = '#38bdf8'
+    context.font = '600 22px ui-sans-serif, system-ui, sans-serif'
+    context.fillText('LÍNEA DE PRUEBA NO INVASIVA', canvas.width / 2, 116)
+  }
+  const texture = new THREE.CanvasTexture(canvas)
+  texture.colorSpace = THREE.SRGBColorSpace
+  texture.needsUpdate = true
+  return texture
+}
+
+function Nameplate({ x }: { x: number }) {
+  const texture = useMemo(() => createNameplateTexture(), [])
+  useEffect(
+    () => () => {
+      texture.dispose()
+    },
+    [texture],
+  )
+
+  return (
+    <group position={[x, -0.12, 0.59]}>
+      <mesh position={[0, 0, -0.008]}>
+        <boxGeometry args={[0.7, 0.25, 0.016]} />
+        <meshStandardMaterial color="#64748b" metalness={0.8} roughness={0.3} />
+      </mesh>
+      <mesh position={[0, 0, 0.004]}>
+        <planeGeometry args={[0.64, 0.2]} />
+        <meshBasicMaterial map={texture} toneMapped={false} />
+      </mesh>
+    </group>
+  )
+}
+
+const CABLE_TARGET: [number, number, number] = [2.72, -1.03, 0.78]
+
+function CableRun() {
+  return (
+    <>
+      {SENSORS.map((sensor) => (
+        <Cable
+          key={sensor.id}
+          from={[
+            sensor.x,
+            SENSOR_RADIUS * Math.cos(sensor.angle),
+            SENSOR_RADIUS * Math.sin(sensor.angle),
+          ]}
+          color={sensor.role === 'emitter' ? '#1f2937' : '#3f2a1a'}
+        />
+      ))}
+    </>
+  )
+}
+
+function Cable({ from, color }: { from: [number, number, number]; color: string }) {
+  const curve = useMemo(
+    () =>
+      new THREE.CubicBezierCurve3(
+        new THREE.Vector3(...from),
+        new THREE.Vector3(from[0] + 0.1, -0.82, Math.max(from[2], 0) + 0.55),
+        new THREE.Vector3(CABLE_TARGET[0] - 0.9, -1.16, CABLE_TARGET[2] + 0.05),
+        new THREE.Vector3(...CABLE_TARGET),
+      ),
+    [from],
+  )
+  const geometry = useMemo(() => new THREE.TubeGeometry(curve, 36, 0.018, 6, false), [curve])
+
+  useEffect(
+    () => () => {
+      geometry.dispose()
+    },
+    [geometry],
+  )
+
+  return (
+    <mesh geometry={geometry}>
+      <meshStandardMaterial color={color} metalness={0.15} roughness={0.72} />
+    </mesh>
+  )
+}
+
+function ControlBox() {
+  return (
+    <group position={[CABLE_TARGET[0] + 0.33, CABLE_TARGET[1] - 0.02, CABLE_TARGET[2]]}>
+      <mesh position={[0, -0.26, 0]}>
+        <boxGeometry args={[0.74, 0.08, 0.46]} />
+        <meshStandardMaterial color="#0f172a" metalness={0.5} roughness={0.6} />
+      </mesh>
+      <mesh>
+        <boxGeometry args={[0.62, 0.48, 0.38]} />
+        <meshStandardMaterial color="#1e293b" metalness={0.7} roughness={0.35} />
+      </mesh>
+      <mesh position={[0, 0, 0.194]}>
+        <boxGeometry args={[0.5, 0.35, 0.02]} />
+        <meshStandardMaterial color="#020617" metalness={0.3} roughness={0.5} />
+      </mesh>
+      <mesh position={[-0.12, 0.07, 0.21]}>
+        <boxGeometry args={[0.2, 0.11, 0.012]} />
+        <meshBasicMaterial color="#22c55e" toneMapped={false} />
+      </mesh>
+      <mesh position={[0.12, 0.07, 0.21]}>
+        <boxGeometry args={[0.12, 0.03, 0.012]} />
+        <meshBasicMaterial color="#38bdf8" toneMapped={false} />
+      </mesh>
+      {[-0.1, 0, 0.1].map((y, index) => (
+        <mesh key={y} position={[0.16, -0.09 + y, 0.21]}>
+          <boxGeometry args={[0.06, 0.018, 0.012]} />
+          <meshBasicMaterial color={index === 1 ? '#f59e0b' : '#475569'} toneMapped={false} />
+        </mesh>
+      ))}
+      <mesh position={[-0.33, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
+        <cylinderGeometry args={[0.04, 0.04, 0.1, 12]} />
+        <meshStandardMaterial color="#94a3b8" metalness={0.9} roughness={0.3} />
+      </mesh>
+      <mesh position={[0.22, 0.28, 0]}>
+        <cylinderGeometry args={[0.018, 0.018, 0.12, 8]} />
+        <meshStandardMaterial color="#64748b" metalness={0.8} roughness={0.35} />
       </mesh>
     </group>
   )
