@@ -1,5 +1,12 @@
-import { flowState, modelComparison, referenceWaveSpeed, waveSpeedAtPressure } from './physics'
+import {
+  flowState,
+  hoopStress,
+  modelComparison,
+  referenceWaveSpeed,
+  waveSpeedAtPressure,
+} from './physics'
 import type {
+  ErrorBudgetPhase,
   Fluid,
   FluidValidationOptions,
   FluidValidationResult,
@@ -133,4 +140,100 @@ export function validateFluid(
     flow,
     stats,
   }
+}
+
+export function samplePressureEstimates(
+  options: Omit<MonteCarloOptions, 'pressures' | 'fluid'> & { pressure: number },
+): number[] {
+  const rng = createRng(options.seed ?? 12345)
+  const estimates: number[] = []
+  for (let i = 0; i < options.trials; i += 1) {
+    estimates.push(
+      measurePressure({
+        truePressure: options.pressure,
+        geometry: options.geometry,
+        material: options.material,
+        tofNoise: options.tofNoise,
+        alphaUncertainty: options.alphaUncertainty,
+        c0Uncertainty: options.c0Uncertainty,
+        rng,
+      }).estimatedPressure,
+    )
+  }
+  return estimates
+}
+
+export function errorBudget(
+  pressure: number,
+  geometry: Geometry,
+  material: Material,
+  noise: number,
+): ErrorBudgetPhase[] {
+  const stress = hoopStress(pressure, geometry)
+  const acousticGain = Math.abs(material.acoustoelastic * stress)
+
+  const pressureTolerance = 0.005
+  const radiusTolerance = 0.001
+  const thicknessTolerance = 0.002
+  const alphaTolerance = 0.02
+  const referenceTolerance = 0.0002
+  const dispersionTolerance = 0.00002
+
+  if (acousticGain === 0) {
+    const total = referenceTolerance + dispersionTolerance + noise
+    return [
+      { phase: 'Mecánica', contribution: 0, cumulative: 0 },
+      { phase: 'Acustoelástica', contribution: referenceTolerance, cumulative: referenceTolerance },
+      {
+        phase: 'Propagación',
+        contribution: dispersionTolerance,
+        cumulative: referenceTolerance + dispersionTolerance,
+      },
+      {
+        phase: 'Detección',
+        contribution: noise,
+        cumulative: referenceTolerance + dispersionTolerance + noise,
+      },
+      { phase: 'Inversión', contribution: 0, cumulative: total },
+    ]
+  }
+
+  const stressToSpeed = acousticGain / (1 - acousticGain)
+  const mechanicalSpeed =
+    stressToSpeed *
+    Math.sqrt(
+      pressureTolerance ** 2 + radiusTolerance ** 2 + thicknessTolerance ** 2,
+    )
+  const acousticSpeed = Math.sqrt(
+    (stressToSpeed * alphaTolerance) ** 2 + referenceTolerance ** 2,
+  )
+  const propagationSpeed = dispersionTolerance
+  const detectionSpeed = noise
+  const totalSpeed =
+    mechanicalSpeed + acousticSpeed + propagationSpeed + detectionSpeed
+  const inverted = totalSpeed / acousticGain
+
+  return [
+    { phase: 'Mecánica', contribution: mechanicalSpeed, cumulative: mechanicalSpeed },
+    {
+      phase: 'Acustoelástica',
+      contribution: acousticSpeed,
+      cumulative: mechanicalSpeed + acousticSpeed,
+    },
+    {
+      phase: 'Propagación',
+      contribution: propagationSpeed,
+      cumulative: mechanicalSpeed + acousticSpeed + propagationSpeed,
+    },
+    {
+      phase: 'Detección',
+      contribution: detectionSpeed,
+      cumulative: totalSpeed,
+    },
+    {
+      phase: 'Inversión',
+      contribution: inverted - totalSpeed,
+      cumulative: inverted,
+    },
+  ]
 }

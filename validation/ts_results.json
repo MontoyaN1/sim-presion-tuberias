@@ -1,0 +1,81 @@
+{
+  "config": {
+    "p1": 10000000,
+    "p2": 8000000,
+    "sectionFraction": 0.5,
+    "trials": 500,
+    "tofNoise": 0.0005,
+    "alphaUncertainty": 0.02,
+    "c0Uncertainty": 0.0002,
+    "seed": 12345,
+    "temperature": 300
+  },
+  "fluids": [
+    {
+      "id": "water",
+      "truePressure": 9000000,
+      "estimatedPressure": 9003143.025965165,
+      "stats": {
+        "truePressure": 9000000,
+        "mean": 9003143.025965165,
+        "std": 310551.65630213416,
+        "bias": 3143.025965165347,
+        "rmse": 310256.86967697024,
+        "mae": 248366.73763246622,
+        "ci95": 608681.2463521829,
+        "relativeError": 0.0003492251072405941
+      },
+      "modelError": 0,
+      "totalError": 3143.025965165347,
+      "flow": {
+        "reynolds": 500000000000,
+        "laminar": false,
+        "model": "hagen-poiseuille"
+      }
+    },
+    {
+      "id": "crude",
+      "truePressure": 9000000,
+      "estimatedPressure": 9003143.025965165,
+      "stats": {
+        "truePressure": 9000000,
+        "mean": 9003143.025965165,
+        "std": 310551.65630213416,
+        "bias": 3143.025965165347,
+        "rmse": 310256.86967697024,
+        "mae": 248366.73763246622,
+        "ci95": 608681.2463521829,
+        "relativeError": 0.0003492251072405941
+      },
+      "modelError": 0,
+      "totalError": 3143.025965165347,
+      "flow": {
+        "reynolds": 180000000.00000003,
+        "laminar": false,
+        "model": "hagen-poiseuille"
+      }
+    },
+    {
+      "id": "hydrogen",
+      "truePressure": 9055385.138137417,
+      "estimatedPressure": 9058545.037403166,
+      "stats": {
+        "truePressure": 9055385.138137417,
+        "mean": 9058545.037403166,
+        "std": 311055.6716694625,
+        "bias": 3159.89926574938,
+        "rmse": 310760.5260958262,
+        "mae": 248773.64084622898,
+        "ci95": 609669.1164721465,
+        "relativeError": 0.0003489524981594911
+      },
+      "modelError": 55385.138137416914,
+      "totalError": 58545.037403166294,
+      "flow": {
+        "reynolds": 45916374404230.125,
+        "laminar": false,
+        "model": "compressible-isothermal"
+      }
+    }
+  ]
+}
