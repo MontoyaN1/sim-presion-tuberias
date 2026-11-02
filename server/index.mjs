@@ -8,6 +8,7 @@ import { allRuns, deleteRun, getRun, insertRun, listRuns, openDatabase } from '.
 const SERVER_DIR = fileURLToPath(new URL('.', import.meta.url))
 const PROJECT_ROOT = resolve(SERVER_DIR, '..')
 const DIST_DIR = resolve(PROJECT_ROOT, 'dist')
+const HOST = process.env.HOST || '0.0.0.0'
 const PORT = Number(process.env.PORT || 3001)
 const APP_VERSION = process.env.APP_VERSION || '0.1.0'
 const MAX_BODY_BYTES = 256 * 1024
@@ -57,8 +58,8 @@ const server = createServer(async (request, response) => {
   }
 })
 
-server.listen(PORT, '127.0.0.1', () => {
-  console.log(`API de métricas en http://127.0.0.1:${PORT}`)
+server.listen(PORT, HOST, () => {
+  console.log(`API de métricas en http://${HOST}:${PORT}`)
   console.log(`SQLite: ${databasePath}`)
 })
 
